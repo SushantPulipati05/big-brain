@@ -10,6 +10,7 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 import { Doc } from "@/convex/_generated/dataModel"
+import Link from "next/link"
 
 export const DocumentCard = ({document}:{document:Doc<'documents'>})=>{
     return(
@@ -22,7 +23,11 @@ export const DocumentCard = ({document}:{document:Doc<'documents'>})=>{
              <p>Card Content</p>
            </CardContent>
            <CardFooter>             
-             <Button variant='secondary'>View</Button>
+             <Button variant='secondary'>
+              <Link href={`/documents/${document._id}`}>
+                View              
+              </Link>
+             </Button>
            </CardFooter>
         </Card>
     )

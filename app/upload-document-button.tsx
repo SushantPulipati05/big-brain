@@ -1,73 +1,40 @@
-'use client';
-
-import { z } from "zod"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
 import { Button } from "@/components/ui/button"
 import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
-import { useMutation } from "convex/react";
-import { api } from "@/convex/_generated/api";
-import { Loader2 } from "lucide-react";
-import { LoadingButton } from "@/components/loading-button";
- 
-const formSchema = z.object({
-  title: z.string().min(2).max(250),
-})
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+  } from "@/components/ui/dialog"
+import { api } from "@/convex/_generated/api"
+import { useMutation } from "convex/react"
+import UploadDocument from "./upload-document-form"
+import { useState } from "react"
+import { Upload } from "lucide-react"
 
-export default function UploadDocument({
-    onUpload,
-} : {
-    onUpload: () => void
-}){
-    
-    const createDocument = useMutation(api.documents.createDocument)
+  export default function CreateDocumentButton() {
 
-    const form = useForm<z.infer<typeof formSchema>>({
-        resolver: zodResolver(formSchema),
-        defaultValues: {
-          title: "",
-        },
+    const [isOpen, setIsOpen] = useState(false);
 
-      })
 
-      async function onSubmit(values: z.infer<typeof formSchema>) {
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-        await createDocument(values)
-        onUpload();
-        console.log(values)
-      }
-      return (
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-            <FormField
-              control={form.control}
-              name="title"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Title</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Form Title" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <LoadingButton 
-              isLoading= {form.formState.isSubmitting}
-              loadingText="uploading..."
-            >
-                Upload
-            </LoadingButton>
-          </form>
-        </Form>
-      )
-}
+    return(
+        <Dialog onOpenChange={setIsOpen} open={isOpen}>
+          <DialogTrigger asChild>
+          <Button className="flex items-center gap-1">
+            <Upload className="w-4 h-4" /> Upload
+          </Button>   
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Upload a document</DialogTitle>
+              <DialogDescription>
+                Upload a document to share with others
+              </DialogDescription>
+                <UploadDocument onUpload = {() => setIsOpen(false)} />             
+            </DialogHeader>
+          </DialogContent>
+        </Dialog>
+
+    )
+  }

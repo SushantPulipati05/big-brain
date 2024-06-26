@@ -3,7 +3,7 @@
 import { api } from "@/convex/_generated/api";
 import { DocumentCard } from "./document-card";
 import { useMutation, useQuery } from "convex/react";
-import CreateDocumentButton from "./create-document-button";
+import CreateDocumentButton from "./upload-document-button";
 
 export default function Home() {
 
@@ -23,13 +23,7 @@ export default function Home() {
             <DocumentCard document = {docs}/>
           )
         })}
-      </div>
-      
-
-        
-
-        
-     
+      </div>     
     </main>
   );
 }
