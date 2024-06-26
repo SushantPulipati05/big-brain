@@ -1,8 +1,6 @@
-'use client';
-
 import { ModeToggle } from "@/components/ui/mode-toggle"
-import { SignInButton, UserButton } from "@clerk/nextjs"
-import { Authenticated, Unauthenticated } from "convex/react"
+import { HeaderActions } from "./header-actions";
+
 import Image from "next/image";
 
 export const Header = () =>{
@@ -13,16 +11,10 @@ export const Header = () =>{
                     <Image className="rounded-md" src='/logo.png' width={40} height={40} alt="big_brain logo" />
                     BigBrain
                 </div>
-                <div>
-                  <Unauthenticated>
-                     <SignInButton />
-                  </Unauthenticated>
-                  <Authenticated>
-                    <div className="flex gap-4">
-                     <ModeToggle />          
-                     <UserButton />  
-                    </div>
-                  </Authenticated>
+                <div className="flex gap-4 items-center">
+                     <ModeToggle />   
+                     <HeaderActions />  
+                  
                 </div>
             </div>
         </div>
