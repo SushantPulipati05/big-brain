@@ -5,6 +5,7 @@ import { Id } from "@/convex/_generated/dataModel";
 import { useMutation, useQuery } from "convex/react";
 import ChatBox from "./chat-form";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Skeleton } from "@/components/ui/skeleton";
 
 
 export default function DocumentPage({
@@ -14,19 +15,32 @@ export default function DocumentPage({
         documentId: Id<"documents">,
     }
 }) {
-    console.log(params.documentId)
+    
     const document = useQuery(api.documents.getDocument, {
     documentId: params.documentId,
-  });
     
-  if(!document){
-    return <div>Document not found</div>
-  }
+  });  
 
   
   return (
     <main className="p-24">
-      <div className="flex items-center justify-between py-4">
+      {!document && (
+        <div className="space-y-8">
+           <div>
+             <Skeleton className="h-[40px] w-[500px]"/>
+           </div>
+           <div className="flex gap-2">
+             <Skeleton className="h-[40px] w-[80px]"/>
+             <Skeleton className="h-[40px] w-[80px]"/>
+           </div>
+           <Skeleton className="h-[500px]"/>
+        </div>
+      )}
+
+      {document && (
+        <>
+
+        <div className="flex items-center justify-between py-4">
         <h1 className="text-4xl font-bold">{document.title}</h1>   
       </div>
         <div className = 'flex gap-12 '>
@@ -45,6 +59,8 @@ export default function DocumentPage({
              </TabsContent>
         </Tabs>                  
         </div>
+        </>
+       )}
     </main>
   );
 }

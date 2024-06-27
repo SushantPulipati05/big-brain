@@ -6,6 +6,7 @@ export default defineSchema({
   documents: defineTable({ 
 
     title: v.string(),
+    description: v.optional(v.string()),
     tokenIdentifier: v.string(),
     fileId: v.id("_storage"),
 

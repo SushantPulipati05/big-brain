@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/card"
 import { Doc } from "@/convex/_generated/dataModel"
 import Link from "next/link"
+import { Loader2 } from "lucide-react"
 
 export const DocumentCard = ({document}:{document:Doc<'documents'>})=>{
     return(
@@ -20,7 +21,15 @@ export const DocumentCard = ({document}:{document:Doc<'documents'>})=>{
              
            </CardHeader>
            <CardContent>
-             <p>Card Content</p>
+             <div>
+               {!document.description ? (
+                 <div className="flex justify-center">
+                    <Loader2 className="animate-spin" />
+                 </div>
+                ) : (
+                  document.description
+                )}
+             </div>
            </CardContent>
            <CardFooter>             
              <Button variant='secondary'>

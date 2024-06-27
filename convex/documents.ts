@@ -1,5 +1,5 @@
 import { ConvexError, v } from 'convex/values'
-import {MutationCtx, QueryCtx, action, internalQuery, mutation, query} from './_generated/server'
+import {MutationCtx, QueryCtx, action, internalAction, internalMutation, internalQuery, mutation, query} from './_generated/server'
 import { api, internal } from './_generated/api'
 import OpenAI from 'openai';
 import { Id } from './_generated/dataModel';
@@ -7,6 +7,7 @@ import { Id } from './_generated/dataModel';
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY, // This is the default and can be omitted
 });
+
 
 export async function hasAccessToDocuments(
     ctx: MutationCtx | QueryCtx,
@@ -27,6 +28,7 @@ export async function hasAccessToDocuments(
     return {document, userId}
 }
 
+
 export const hasAccessToDocumentQuery = internalQuery({
     args:{
         documentId: v.id("documents")
@@ -39,7 +41,7 @@ export const hasAccessToDocumentQuery = internalQuery({
 
 export const generateUploadUrl = mutation(async (ctx) => {
     return await ctx.storage.generateUploadUrl();
-  });
+});
 
 
 export const getDocuments = query({
@@ -48,7 +50,7 @@ export const getDocuments = query({
         const userId = (await ctx.auth.getUserIdentity())?.tokenIdentifier
         console.log(userId)
         if (!userId) {
-            return [];
+            return undefined;
         }
 
         return await ctx.db.query('documents')
@@ -57,6 +59,7 @@ export const getDocuments = query({
 
     }
 })
+
 
 export const getDocument = query({
     args: {
@@ -91,13 +94,77 @@ export const createDocument = mutation({
         }
 
     
-      await ctx.db.insert('documents', {
+       const documentId =await ctx.db.insert('documents', {
             title: args.title,
             tokenIdentifier: userId,
             fileId: args.fileId,
+            description: ""
+        })
+
+      await ctx.scheduler.runAfter(0, internal.documents.generateDocumentDescription, {
+        fileId: args.fileId,
+        documentId
+      })
+    }
+})
+
+
+export const updateDocumentDescription = internalMutation({
+    args: {
+        documentId: v.id('documents'),
+        description: v.string(),
+    },
+    handler: async (ctx, args) => {
+        await ctx.db.patch( args.documentId, {
+            description: args.description
         })
     }
 })
+
+
+export const generateDocumentDescription = internalAction({
+    args: {
+        documentId: v.id('documents'),
+        fileId: v.id("_storage")
+    }, 
+    handler: async(ctx, args) => {
+        const file = await ctx.storage.get(args.fileId)
+        if(!file){
+            throw new ConvexError('file not found')
+        }
+
+        const text = await file.text()
+
+        const chatCompletion: OpenAI.Chat.Completions.ChatCompletion = 
+        await openai.chat.completions.create({
+          messages: [
+            { 
+                role: 'system', 
+                content: `Here is a text file ${text}`
+            },
+            {
+                role: 'user',
+                content: `please generate 1 sentence description for this document.`
+            }
+        ],
+          model: 'gpt-3.5-turbo',
+        });
+        if(chatCompletion === null){
+            throw new ConvexError('chat completion not found')
+        }
+
+        const description = chatCompletion.choices[0].message.content ?? "could not give a description for this document"
+        console.log(description)
+
+        await ctx.runMutation(internal.documents.updateDocumentDescription, {
+            documentId: args.documentId,
+            description: description
+        })
+
+
+    }
+})
+
 
 export const askQuestion = action({
     args:{
@@ -118,7 +185,6 @@ export const askQuestion = action({
         }
 
         const text = await file.text();
-        console.log(text)
         
         const chatCompletion: OpenAI.Chat.Completions.ChatCompletion = 
         await openai.chat.completions.create({
