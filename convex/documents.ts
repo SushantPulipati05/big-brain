@@ -1,11 +1,40 @@
 import { ConvexError, v } from 'convex/values'
-import {action, mutation, query} from './_generated/server'
-import { api } from './_generated/api'
+import {MutationCtx, QueryCtx, action, internalQuery, mutation, query} from './_generated/server'
+import { api, internal } from './_generated/api'
 import OpenAI from 'openai';
+import { Id } from './_generated/dataModel';
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY, // This is the default and can be omitted
 });
+
+export async function hasAccessToDocuments(
+    ctx: MutationCtx | QueryCtx,
+    documentId: Id<"documents">
+) {
+    const userId = (await ctx.auth.getUserIdentity())?.tokenIdentifier
+        if(!userId){
+            throw new ConvexError('user not authenticated')
+        }    
+
+    const document = await ctx.db.get(documentId)
+    if(!document){
+        throw new ConvexError('document not found')
+    }
+    if(document.tokenIdentifier !== userId){
+        throw new ConvexError('user not authenticated')        
+    }
+    return {document, userId}
+}
+
+export const hasAccessToDocumentQuery = internalQuery({
+    args:{
+        documentId: v.id("documents")
+    },
+    handler: async (ctx, args) => {
+        return await hasAccessToDocuments(ctx, args.documentId)
+    }
+})
 
 
 export const generateUploadUrl = mutation(async (ctx) => {
@@ -34,24 +63,13 @@ export const getDocument = query({
         documentId : v.id('documents')
     },
     handler: async(ctx, args) =>{
-        
-        const userId = (await ctx.auth.getUserIdentity())?.tokenIdentifier
-        console.log(userId)
-        if (!userId) {
-            return null;
-        }
-        const document = await ctx.db.get(args.documentId)
-
-        if(!document){
+        const accessObj = await hasAccessToDocuments(ctx, args.documentId)
+        if(!accessObj){
             throw new ConvexError('document not found')
-        }
+        }      
 
-        if(document.tokenIdentifier!== userId){
-            throw new ConvexError('user not authenticated')
-        }
-
-        return {...document,
-             documentUrl:  await ctx.storage.getUrl(document.fileId)
+        return {...accessObj.document,
+             documentUrl:  await ctx.storage.getUrl(accessObj.document.fileId)
         };
 
     }
@@ -87,19 +105,14 @@ export const askQuestion = action({
         documentId: v.id("documents")
     },
     handler: async(ctx, args) => {
-        const userId = (await ctx.auth.getUserIdentity())?.tokenIdentifier
-        if(!userId){
-            throw new ConvexError('user not authenticated')
-        }
-        
-        const document = await ctx.runQuery(api.documents.getDocument ,{
+        const accessObj = await ctx.runQuery(internal.documents.hasAccessToDocumentQuery, {
             documentId: args.documentId
         })
-        if(!document){
-            throw new ConvexError('document not found')
+        if(!accessObj){
+            throw new ConvexError('not found or you do not have access lmao')
         }
 
-        const file = await ctx.storage.get(document.fileId)
+        const file = await ctx.storage.get(accessObj.document.fileId)
         if(!file){
             throw new ConvexError('file not found')
         }
@@ -125,8 +138,23 @@ export const askQuestion = action({
             throw new ConvexError('chat completion not found')
         }
         
+        //to store the prompt from the user
+        await ctx.runMutation(internal.chats.createChatRecord, {
+            documentId: args.documentId,
+            text: args.question,
+            isHuman: true,
+            tokenIdentifier: accessObj.userId
+        })
+
+        //to store the text generated from the AI
+        const response = chatCompletion.choices[0].message.content ?? "could not generate a response"
         
-        console.log(chatCompletion.choices[0].message.content)
+        await ctx.runMutation(internal.chats.createChatRecord, {
+            documentId: args.documentId,
+            text: response,
+            isHuman: false,
+            tokenIdentifier: accessObj.userId
+        })
 
         return chatCompletion.choices[0].message.content      
     
