@@ -52,7 +52,7 @@ import { useState } from "react"
             <AlertDialogFooter>
               <AlertDialogCancel>Cancel</AlertDialogCancel>
 
-              <Link href='/'>
+              <Link href='/dashboard/document'>
                 <LoadingButton
                   onClick={()=>{
                       setIsLoading(true);
