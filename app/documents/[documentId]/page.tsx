@@ -6,6 +6,7 @@ import { useMutation, useQuery } from "convex/react";
 import ChatBox from "./chat-form";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Skeleton } from "@/components/ui/skeleton";
+import { DeleteDocumentButton } from "./delete-document-button";
 
 
 export default function DocumentPage({
@@ -17,9 +18,8 @@ export default function DocumentPage({
 }) {
     
     const document = useQuery(api.documents.getDocument, {
-    documentId: params.documentId,
-    
-  });  
+    documentId: params.documentId,   
+    });  
 
   
   return (
@@ -41,7 +41,8 @@ export default function DocumentPage({
         <>
 
         <div className="flex items-center justify-between py-4">
-        <h1 className="text-4xl font-bold">{document.title}</h1>   
+        <h1 className="text-4xl font-bold">{document.title}</h1> 
+        <DeleteDocumentButton documentId={document._id}/>  
       </div>
         <div className = 'flex gap-12 '>
         <Tabs defaultValue="account" className="w-full">
