@@ -44,14 +44,14 @@ export default function DocumentPage({
         <h1 className="text-4xl font-bold">{document.title}</h1> 
         <DeleteDocumentButton documentId={document._id}/>  
       </div>
-        <div className = 'flex gap-12 '>
+        <div className = 'flex gap-12 w-full '>
         <Tabs defaultValue="account" className="w-full">
              <TabsList>
                  <TabsTrigger value="document">Document</TabsTrigger>
                  <TabsTrigger value="chat">Chat</TabsTrigger>
              </TabsList>
-             <TabsContent value="document" className="w-full">
-                <div className="bg-gray-900 p-4 rounded-xl flex-1 h-[600px]">
+             <TabsContent value="document">
+                <div className=" w-full bg-gray-900 p-4 rounded-xl flex-1 h-[600px]">
                   {document.documentUrl && (<iframe className="w-full h-full" src={document.documentUrl} /> )}            
                 </div>
              </TabsContent>

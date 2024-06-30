@@ -33,7 +33,7 @@ export const DocumentCard = ({document}:{document:Doc<'documents'>})=>{
            </CardContent>
            <CardFooter>             
              <Button variant='secondary'>
-              <Link href={`/documents/${document._id}`}>
+              <Link href={`/dashboard/documents/${document._id}`}>
                 View              
               </Link>
              </Button>

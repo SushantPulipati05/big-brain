@@ -8,6 +8,7 @@ import { ReactNode } from "react"
 import { cn } from "@/lib/utils";
 import { useParams } from "next/navigation";
 import { Id } from "@/convex/_generated/dataModel";
+import Image from "next/image";
 
 
 
@@ -15,12 +16,28 @@ export default function NotesLayout({children}:{children: ReactNode}){
     const notes = useQuery(api.notes.getNotes)
     const { noteId } = useParams<{noteId: Id<"notes">}>();
 
+    const hasNotes = notes && notes.length > 0
+
     return(
         <main className="space-y-8 w-full">
           <div className="flex items-center justify-between py-4">
              <h1 className="text-4xl font-bold">My Notes</h1>
              <CreateNoteButton />
           </div>
+          {!hasNotes && (
+            <div className="flex flex-col justify-center items-center gap-8 py-12" >
+            <Image
+              src='/noNotes.svg'
+              width={200}
+              height={200}
+              alt="you haven't created any notes yet"          
+            />
+            <h2>No notes created yet</h2>  
+            <CreateNoteButton />      
+          </div>
+          )}
+
+          {hasNotes && (
 
           <div className="flex gap-12">
           <ul className=" w-[300px]">
@@ -35,11 +52,12 @@ export default function NotesLayout({children}:{children: ReactNode}){
               ))}
           </ul>
 
-          <div className="bg-slate-800 rounded p-4 w-full">
+          <div className=" bg-slate-800 rounded p-4 w-full">
            {children}
           </div>
 
           </div>
+          )}
 
         </main>
     )

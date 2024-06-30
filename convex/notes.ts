@@ -57,3 +57,26 @@ export const createNotes = mutation({
         return note;
     }
 })
+
+export const deleteNote = mutation({
+    args: {
+        noteId: v.id("notes"),
+    },
+    handler: async(ctx, args) => {
+        const userId = (await ctx.auth.getUserIdentity())?.tokenIdentifier;
+        if(!userId){
+            return null;
+        }
+
+        const note = await ctx.db.get(args.noteId)
+        if(!note){
+            return null;
+        }
+        if(note.tokenIdentifier !== userId){
+            return null;
+        }
+
+        await ctx.db.delete(args.noteId)
+
+    }
+})
