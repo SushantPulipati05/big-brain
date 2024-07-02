@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { SearchForm } from "./search-form";
 import { Doc } from "@/convex/_generated/dataModel";
 import { api } from "@/convex/_generated/api";
@@ -11,6 +11,14 @@ export default function SearchPage(){
     const [results, setResults] =
     useState<typeof api.search.searchAction._returnType>(null);
 
+    useEffect(() => {
+        const storedResults = localStorage.getItem("searchResults")
+        if(!storedResults) {
+            return;
+        }
+        setResults(JSON.parse(storedResults))
+    }, [])
+
     return(
         <main className="w-full">
           <div className="flex items-center justify-between py-4">
@@ -18,7 +26,10 @@ export default function SearchPage(){
           </div>
           
           <div className="mb-4">
-            <SearchForm setResults={setResults} />
+            <SearchForm setResults={(searchResults)=>{
+                localStorage.setItem("searchResults", JSON.stringify(searchResults))
+                setResults(searchResults)
+            }} />
           </div>
           
 
@@ -41,7 +52,7 @@ export default function SearchPage(){
                     <span>type: document</span>
                     {result.score}
                     {result.record.title}
-                    {result.record.description.substring(0,500) + "..."}
+                    {result.record.description?.substring(0,500) + "..."}
                 </li>
                     </Link>
                 )

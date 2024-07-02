@@ -9,6 +9,7 @@ import { cn } from "@/lib/utils";
 import { useParams } from "next/navigation";
 import { Id } from "@/convex/_generated/dataModel";
 import Image from "next/image";
+import { Skeleton } from "@/components/ui/skeleton";
 
 
 
@@ -24,7 +25,25 @@ export default function NotesLayout({children}:{children: ReactNode}){
              <h1 className="text-4xl font-bold">My Notes</h1>
              <CreateNoteButton />
           </div>
-          {!hasNotes && (
+
+          {!notes && (
+            <div className="flex gap-12">
+            <div className="w-[200px] space-y-4">
+              <Skeleton className="h-[20px] rounded" />
+              <Skeleton className="h-[20px] rounded" />
+              <Skeleton className="h-[20px] rounded" />
+              <Skeleton className="h-[20px] rounded" />
+              <Skeleton className="h-[20px] rounded" />
+              <Skeleton className="h-[20px] rounded" />
+            </div>
+            <div className="flex-1">
+              <Skeleton className="h-[300px] w-full " />
+            </div>
+            </div>
+
+          )}
+
+          {notes?.length === 0 && (
             <div className="flex flex-col justify-center items-center gap-8 py-12" >
             <Image
               src='/noNotes.svg'
@@ -37,8 +56,7 @@ export default function NotesLayout({children}:{children: ReactNode}){
           </div>
           )}
 
-          {hasNotes && (
-
+          {notes && notes.length > 0 && (
           <div className="flex gap-12">
           <ul className=" w-[300px]">
             {notes?.map(note =>(

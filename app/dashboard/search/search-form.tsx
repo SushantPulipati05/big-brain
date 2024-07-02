@@ -39,8 +39,7 @@ export function SearchForm(
       })
 
       async function onSubmit(values: z.infer<typeof formSchema>) { 
-        await searchAction({search: values.search}).then(setResults)      
-        form.reset();
+        await searchAction({search: values.search}).then(setResults)     
       }
 
       return(
