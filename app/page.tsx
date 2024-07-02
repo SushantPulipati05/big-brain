@@ -1,7 +1,11 @@
 import { Button } from "@/components/ui/button";
 import { SignInButton } from "@clerk/nextjs";
 import Image from "next/image";
+import { redirect } from "next/navigation";
 
+function goOut(){
+  return redirect('/dashboard/documents')
+}
 
 export default function LandingPage() {
   return (
@@ -40,10 +44,8 @@ export default function LandingPage() {
                 <Button className="rounded-md bg-indigo-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
                   Get started
                 </Button>
-              </SignInButton>       
-            </div>
-            <div>
-              <a href='/dashboard/documents'>Already Logged in?</a>
+              </SignInButton>
+              
             </div>
           </div>
         </div>
