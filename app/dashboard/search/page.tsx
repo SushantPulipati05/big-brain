@@ -5,6 +5,39 @@ import { SearchForm } from "./search-form";
 import { Doc } from "@/convex/_generated/dataModel";
 import { api } from "@/convex/_generated/api";
 import Link from "next/link";
+import { Files, Notebook } from "lucide-react";
+
+function SearchResults({
+    url,
+    score,
+    text,
+    type
+}:{
+    url: string,
+    score: number,
+    text: string,
+    type: string
+}){
+    return(
+        <Link href={url}>
+           <li className="hover:bg-slate-600 bg-slate-800 rounded p-4 whitespace-pre-line space-y-4">            
+            <div className="flex justify-between gap-2 text-xl items-center">
+                <div className="flex gap-2 items-center">
+                  {type === "notes"? <Notebook />:<Files />}
+                  {type === 'notes'? "Note": "Document"}
+                </div>
+                <div className="text-sm">
+                    Relevancy of {score.toFixed(2)}
+                </div>
+            </div>
+            <div>
+                {text.substring(0,500) + "..."}
+            </div>            
+           </li>
+        </Link>
+    )
+
+}
 
 
 export default function SearchPage(){   
@@ -37,24 +70,21 @@ export default function SearchPage(){
           {results?.map((result) => {
             if(result.type === 'notes'){
                 return(
-                    <Link href={`/dashboard/notes/${result.record._id}`}>
-                    <li className="hover:bg-slate-600 bg-slate-800 rounded p-4 whitespace-pre-line">
-                    <span>type: note</span>
-                    {result.score}
-                    {result.record.text.substring(0,200) + "..."}
-                    </li>
-                    </Link>
+                    <SearchResults 
+                       url= {`/dashboard/notes/${result.record._id}`}
+                       score={result.score}
+                       text= {result.record.text}
+                       type= {result.type}
+                    />                 
                 ) 
             } else {
                 return (
-                    <Link href={`/dashboard/documents/${result.record._id}`}>
-                <li className="hover:bg-slate-600 bg-slate-800 rounded p-4 whitespace-pre-line">
-                    <span>type: document</span>
-                    {result.score}
-                    {result.record.title}
-                    {result.record.description?.substring(0,500) + "..."}
-                </li>
-                    </Link>
+                    <SearchResults 
+                       url= {`/dashboard/documents/${result.record._id}`}
+                       score={result.score}
+                       text= {result.record.title + ":" + result.record.description}
+                       type= {result.type}
+                    />
                 )
             }
           })}

@@ -23,7 +23,7 @@ export default function DocumentPage({
 
   
   return (
-    <main className="p-24">
+    <main className="space-y-8 w-full">
       {!document && (
         <div className="space-y-8">
            <div>
@@ -40,18 +40,18 @@ export default function DocumentPage({
       {document && (
         <>
 
-        <div className="flex items-center justify-between py-4">
+        <div className="flex items-center justify-between ">
         <h1 className="text-4xl font-bold">{document.title}</h1> 
         <DeleteDocumentButton documentId={document._id}/>  
       </div>
-        <div className = 'flex gap-12 w-full '>
-        <Tabs defaultValue="account" className="w-full">
-             <TabsList>
+        <div className = 'flex gap-12'>
+        <Tabs defaultValue="document" className="w-full">
+             <TabsList className="mb-2">
                  <TabsTrigger value="document">Document</TabsTrigger>
                  <TabsTrigger value="chat">Chat</TabsTrigger>
              </TabsList>
              <TabsContent value="document">
-                <div className="  bg-gray-900 p-4 rounded-xl flex-1 h-[600px] w-[900px]">
+                <div className="bg-gray-900 p-4 rounded-xl flex-1 h-[500px]">
                   {document.documentUrl && (<iframe className="w-full h-full" src={document.documentUrl} /> )}            
                 </div>
              </TabsContent>

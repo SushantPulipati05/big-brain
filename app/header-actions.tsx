@@ -9,10 +9,8 @@ export const HeaderActions = () =>{
           <Unauthenticated>
             <SignInButton />
           </Unauthenticated>
-          <Authenticated>
-           
-             <UserButton />  
-            
+          <Authenticated>           
+             <UserButton />            
           </Authenticated>
           <AuthLoading >Loading...</AuthLoading>
         </>
