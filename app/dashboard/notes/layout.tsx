@@ -60,7 +60,7 @@ export default function NotesLayout({children}:{children: ReactNode}){
           <div className="flex gap-12">
           <ul className=" w-[300px]">
             {notes?.map(note =>(
-              <Link href={`/dashboard/notes/${note._id}`}>
+              <Link key={note._id} href={`/dashboard/notes/${note._id}`}>
                 <li 
                 className={cn( "text-base p-1 hover:text-cyan-400", {
                   "text-cyan-600" : note._id === noteId

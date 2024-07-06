@@ -24,7 +24,7 @@ export default function ChatBox({
                 this is the place where the text from AI will be displayed!!\
             </div> 
             {chats?.map((chat)=>(
-                <div className={cn(
+                <div key={chat._id} className={cn(
                     {
                         "bg-slate-800 text-right": chat.isHuman,
                         "dark:bg-slate-950 bg-slate-300": !chat.isHuman,

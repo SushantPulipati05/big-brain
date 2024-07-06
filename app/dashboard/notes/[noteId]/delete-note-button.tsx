@@ -48,7 +48,7 @@ import { useState } from "react"
             <AlertDialogHeader>
               <AlertDialogTitle>Are you sure you want to delete this note?</AlertDialogTitle>
               <AlertDialogDescription>
-                  Your note can not be recovered after it's been deleted.
+                  Your note can not be recovered after its been deleted.
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>

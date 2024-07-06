@@ -42,7 +42,7 @@ function SearchResults({
 
 export default function SearchPage(){   
     const [results, setResults] =
-    useState<typeof api.search.searchAction._returnType>(null);
+    useState<typeof api.search.searchAction._returnType>([]);
 
     useEffect(() => {
         const storedResults = localStorage.getItem("searchResults")
@@ -71,6 +71,7 @@ export default function SearchPage(){
             if(result.type === 'notes'){
                 return(
                     <SearchResults 
+                       key= {result.record._id}
                        url= {`/dashboard/notes/${result.record._id}`}
                        score={result.score}
                        text= {result.record.text}
@@ -80,6 +81,7 @@ export default function SearchPage(){
             } else {
                 return (
                     <SearchResults 
+                       key= {result.record._id}
                        url= {`/dashboard/documents/${result.record._id}`}
                        score={result.score}
                        text= {result.record.title + ":" + result.record.description}
